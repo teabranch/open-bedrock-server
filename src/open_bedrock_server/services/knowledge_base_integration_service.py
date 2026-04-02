@@ -31,7 +31,11 @@ class KnowledgeBaseIntegrationService:
     """
 
     def __init__(self):
-        self.kb_service = get_knowledge_base_service()
+        try:
+            self.kb_service = get_knowledge_base_service()
+        except Exception as e:
+            logger.warning(f"Knowledge Base service unavailable: {e}")
+            self.kb_service = None
         self.detector = KnowledgeBaseDetector()
 
     async def enhance_chat_request(
@@ -368,7 +372,7 @@ User's question: {query}"""
         # 2. High confidence retrieval intent
         # 3. Simple query structure (better for native RAG)
 
-        if not knowledge_base_id:
+        if not knowledge_base_id or not self.kb_service:
             return False
 
         confidence = self.detector.get_retrieval_confidence_score(request.messages)
