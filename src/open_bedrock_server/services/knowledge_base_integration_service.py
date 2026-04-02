@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from ..core.exceptions import (
+    ConfigurationError,
     ServiceApiError,
 )
 from ..core.knowledge_base_models import (
@@ -33,8 +34,10 @@ class KnowledgeBaseIntegrationService:
     def __init__(self):
         try:
             self.kb_service = get_knowledge_base_service()
-        except Exception as e:
-            logger.warning(f"Knowledge Base service unavailable: {e}")
+        except ConfigurationError as e:
+            logger.warning(
+                "Knowledge Base service unavailable: %s", e, exc_info=True
+            )
             self.kb_service = None
         self.detector = KnowledgeBaseDetector()
 
@@ -53,6 +56,9 @@ class KnowledgeBaseIntegrationService:
         Returns:
             ChatCompletionRequest: Enhanced request with KB context if applicable
         """
+        if not self.kb_service:
+            return request
+
         try:
             # Extract KB parameters from request or request_data
             kb_id = request.knowledge_base_id
