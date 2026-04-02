@@ -332,8 +332,9 @@ class TestRealAPIComparison:
         )
 
 
+@pytest.mark.real_api
 class TestConfigurationValidation:
-    """Test configuration validation and error handling (no real API calls)."""
+    """Test configuration validation and error handling."""
 
     def test_env_variables_loaded(self):
         """Test that environment variables are properly loaded."""
