@@ -1,44 +1,64 @@
 ---
-description: Open Bedrock Server Server - A unified, provider-agnostic chat completions API server
-layout: default
-nav_order: 1
-permalink: /
 title: Home
+nav_order: 0
+permalink: /
 ---
 
-# Open Bedrock Server Server
-
-{: .fs-9 }
+# Open Bedrock Server
 
 A unified, provider-agnostic chat completions API server supporting OpenAI and AWS Bedrock.
-{: .fs-6 .fw-300 }
 
-[Get started now](getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View on GitHub](https://github.com/teabranch/open-bedrock-server){: .btn .fs-5 .mb-4 .mb-md-0 }
+<p><em>Find this useful? Star the repo to follow updates and show support!</em>
+<iframe src="https://ghbtns.com/github-btn.html?user=teabranch&repo=open-bedrock-server&type=star&count=true&size=large" frameborder="0" scrolling="0" width="170" height="30" title="Star on GitHub" style="vertical-align: middle;"></iframe></p>
+
+> **Install from PyPI** — `pip install open-bedrock-server` and run `bedrock-chat serve`.
+> See [CLI Reference](cli-reference) for all options.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### Installation & Setup
+### Installation
 
 ```bash
-# Clone and install
+# From PyPI
+pip install open-bedrock-server
+
+# Or from source
 git clone https://github.com/teabranch/open-bedrock-server.git
 cd open-bedrock-server
 uv pip install -e .
+```
 
-# Configure environment
+### Configure
+
+```bash
 bedrock-chat config set
+```
 
-# Start server
+Or set environment variables:
+
+```bash
+export OPENAI_API_KEY=sk-your-key
+export AWS_PROFILE=your-profile
+export API_KEY=your-server-auth-key
+```
+
+### Run
+
+```bash
 bedrock-chat serve --host 0.0.0.0 --port 8000
+```
+
+Verify:
+
+```bash
+curl http://localhost:8000/health
 ```
 
 ### Basic Usage
 
 ```bash
-# Test the unified endpoint
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your-api-key" \
@@ -49,31 +69,9 @@ curl -X POST http://localhost:8000/v1/chat/completions \
   }'
 ```
 
-### File Query Example
-
-```bash
-# Upload a file
-curl -X POST http://localhost:8000/v1/files \
-  -H "Authorization: Bearer your-api-key" \
-  -F "file=@data.csv" \
-  -F "purpose=assistants"
-
-# Use file in chat completion
-curl -X POST http://localhost:8000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-api-key" \
-  -d '{
-    "model": "gpt-4o-mini",
-    "messages": [{"role": "user", "content": "Analyze this data"}],
-    "file_ids": ["file-abc123def456"]
-  }'
-```
-
 ---
 
-## 🔄 Unified Endpoint
-
-### Single Endpoint for Everything
+## Unified Endpoint
 
 The `/v1/chat/completions` endpoint is the **only endpoint you need**. It:
 
@@ -81,65 +79,52 @@ The `/v1/chat/completions` endpoint is the **only endpoint you need**. It:
 2. **Routes** to the appropriate provider based on model ID
 3. **Converts** between formats as needed
 4. **Streams** responses in real-time when requested
-5. **Returns** responses in your preferred format
 
 ### Format Combinations
 
-All format combinations are supported through the unified endpoint:
-
 | Input Format | Output Format | Use Case | Streaming |
 |-------------|---------------|----------|-----------|
-| OpenAI | OpenAI | Standard OpenAI usage | ✅ |
-| OpenAI | Bedrock Claude | OpenAI clients → Bedrock response | ✅ |
-| OpenAI | Bedrock Titan | OpenAI clients → Titan response | ✅ |
-| Bedrock Claude | OpenAI | Bedrock clients → OpenAI response | ✅ |
-| Bedrock Claude | Bedrock Claude | Claude format preserved | ✅ |
-| Bedrock Titan | OpenAI | Titan clients → OpenAI response | ✅ |
-| Bedrock Titan | Bedrock Titan | Titan format preserved | ✅ |
+| OpenAI | OpenAI | Standard OpenAI usage | Yes |
+| OpenAI | Bedrock Claude | OpenAI clients to Bedrock response | Yes |
+| OpenAI | Bedrock Titan | OpenAI clients to Titan response | Yes |
+| Bedrock Claude | OpenAI | Bedrock clients to OpenAI response | Yes |
+| Bedrock Claude | Bedrock Claude | Claude format preserved | Yes |
+| Bedrock Titan | OpenAI | Titan clients to OpenAI response | Yes |
+| Bedrock Titan | Bedrock Titan | Titan format preserved | Yes |
 
 ---
 
-## 📚 Documentation
+## Documentation
 
-### Core Features
-- **[Getting Started](getting-started.md)** - Quick setup and basic usage
-- **[API Reference](api-reference.md)** - Complete API documentation
-- **[CLI Reference](cli-reference.md)** - Command-line interface guide
-
-### Advanced Features
-- **[Knowledge Bases (RAG)](KNOWLEDGE_BASES.md)** - 🧠 **NEW!** Bedrock Knowledge Bases integration for RAG
-- **[Files API](FILES_API.md)** - File upload and management capabilities
-
-### Development
-- **[Development Guide](development.md)** - Contributing and development setup
-- **[Testing](testing.md)** - Testing strategies and examples
-
-## 📚 Original Documentation
-
-### Core Documentation
+### Core
 
 - **[Getting Started](getting-started)** - Installation, setup, and first steps
 - **[API Reference](api-reference)** - Complete API documentation
-- __[Files API](files_api)__ - File upload, processing, and query system
 - **[CLI Reference](cli-reference)** - Command-line interface guide
-- **[Architecture](guides/architecture)** - System design and architecture
+
+### Advanced Features
+
+- **[Knowledge Bases (RAG)](knowledge_bases)** - Bedrock Knowledge Bases integration
+- **[Files API](FILES_API)** - File upload and management capabilities
 
 ### Guides
 
 - **[Usage Guide](guides/usage)** - Programming examples and use cases
 - **[AWS Authentication](guides/aws-authentication)** - AWS credential configuration
+- **[Architecture](guides/architecture)** - System design and architecture
 - **[Core Components](guides/core-components)** - Detailed component documentation
-- **[Testing](testing)** - Testing strategies and comprehensive test guide
-- **[Real API Testing](real-api-testing)** - Real API integration test documentation
+- **[Testing](guides/testing)** - Testing strategies and coverage
+- **[Packaging](guides/packaging)** - Building and distributing the package
 
 ### Development
 
 - **[Development Guide](development)** - Extending and customizing the server
-- **[Packaging Guide](guides/packaging)** - Building and distributing the package
+- **[Test Suite](testing)** - Test suite organization
+- **[Real API Testing](real-api-testing)** - Real API integration tests
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
 ### Unified Interface
 
@@ -152,7 +137,7 @@ All format combinations are supported through the unified endpoint:
 
 - **File Upload**: Upload documents to S3 storage with OpenAI-compatible API
 - **Smart Processing**: Automatic content extraction from CSV, JSON, HTML, XML, Markdown, and text files
-- __Chat Integration__: Use `file_ids` parameter to include file content as context in conversations
+- **Chat Integration**: Use `file_ids` parameter to include file content as context in conversations
 - **File Management**: Complete CRUD operations for uploaded files
 
 ### Enterprise Ready
@@ -171,7 +156,7 @@ All format combinations are supported through the unified endpoint:
 
 ---
 
-## 🔗 Quick Links
+## Quick Links
 
 - **[GitHub Repository](https://github.com/teabranch/open-bedrock-server)**
 - **[Issues & Support](https://github.com/teabranch/open-bedrock-server/issues)**
@@ -180,6 +165,6 @@ All format combinations are supported through the unified endpoint:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/teabranch/open-bedrock-server/blob/main/LICENSE) file for details.

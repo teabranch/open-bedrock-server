@@ -1,6 +1,12 @@
+---
+title: Knowledge Bases
+nav_order: 10
+description: AWS Bedrock Knowledge Bases (RAG) integration
+---
+
 # Knowledge Bases (RAG) Integration
 
-This guide covers the integrated AWS Bedrock Knowledge Bases functionality in the Open Bedrock Server Server, providing Retrieval-Augmented Generation (RAG) capabilities.
+This guide covers the integrated AWS Bedrock Knowledge Bases functionality in the Open Bedrock Server, providing Retrieval-Augmented Generation (RAG) capabilities.
 
 ## Overview
 
