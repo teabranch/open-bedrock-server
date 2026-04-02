@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from ..core.exceptions import (
+    ConfigurationError,
     ServiceApiError,
 )
 from ..core.knowledge_base_models import (
@@ -31,7 +32,13 @@ class KnowledgeBaseIntegrationService:
     """
 
     def __init__(self):
-        self.kb_service = get_knowledge_base_service()
+        try:
+            self.kb_service = get_knowledge_base_service()
+        except ConfigurationError as e:
+            logger.warning(
+                "Knowledge Base service unavailable: %s", e, exc_info=True
+            )
+            self.kb_service = None
         self.detector = KnowledgeBaseDetector()
 
     async def enhance_chat_request(
@@ -49,6 +56,9 @@ class KnowledgeBaseIntegrationService:
         Returns:
             ChatCompletionRequest: Enhanced request with KB context if applicable
         """
+        if not self.kb_service:
+            return request
+
         try:
             # Extract KB parameters from request or request_data
             kb_id = request.knowledge_base_id
@@ -368,7 +378,7 @@ User's question: {query}"""
         # 2. High confidence retrieval intent
         # 3. Simple query structure (better for native RAG)
 
-        if not knowledge_base_id:
+        if not knowledge_base_id or not self.kb_service:
             return False
 
         confidence = self.detector.get_retrieval_confidence_score(request.messages)
