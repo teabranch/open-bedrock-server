@@ -1,70 +1,50 @@
-# Jekyll configuration for GitHub Pages
 title: Open Bedrock Server
-description: A unified, provider-agnostic chat completions API server supporting OpenAI and AWS Bedrock
-url: "https://teabranch.github.io"
+description: >-
+  A unified, provider-agnostic chat completions API server supporting OpenAI and AWS Bedrock.
 baseurl: "/open-bedrock-server"
-repository: teabranch/open-bedrock-server
-# Theme
-theme: minima
-remote_theme: pages-themes/minimal@v0.2.0
+url: "https://teabranch.github.io"
+
+theme: just-the-docs
+color_scheme: anthropic
+
+search_enabled: true
+search:
+  button: true
+
+aux_links:
+  "GitHub":
+    - "https://github.com/teabranch/open-bedrock-server"
+aux_links_new_tab: true
+
+footer_content: >-
+  Open Bedrock Server — Licensed under
+  <a href="https://github.com/teabranch/open-bedrock-server/blob/main/LICENSE">MIT</a>.
 
 webmaster_verifications:
   google: SAWMasZ1hKCZm8hnk0xFUgqnFYYPgdrKG8jKuTJa6a0
-  
-# Plugins
-plugins:
-  - jekyll-feed
-  - jekyll-sitemap
-  - jekyll-seo-tag
 
-# Markdown settings
+plugins:
+  - jekyll-seo-tag
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: false
+
 markdown: kramdown
 kramdown:
   input: GFM
   syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    css_class: 'highlight'
 
-# Collections
-collections:
-  guides:
-    output: true
-    permalink: /:collection/:name/
-
-# Navigation
-header_pages:
-  - index.md
-  - getting-started.md
-  - api-reference.md
-  - guides/index.md
-  - cli-reference.md
-  - development.md
-
-# Defaults
 defaults:
   - scope:
       path: ""
-      type: "pages"
-    values:
-      layout: "default"
-  - scope:
-      path: ""
-      type: "guides"
     values:
       layout: "default"
 
-# Exclude from processing
 exclude:
   - Gemfile
   - Gemfile.lock
+  - README.md
   - node_modules
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-
-# GitHub Pages settings
-github:
-  repository_name: open-bedrock-server
-  repository_url: https://github.com/teabranch/open-bedrock-server 
-
+  - vendor/

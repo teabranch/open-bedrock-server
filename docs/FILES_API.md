@@ -1,3 +1,9 @@
+---
+title: Files API
+nav_order: 9
+description: File upload, management, and chat integration API
+---
+
 # Files API Documentation
 
 ## Overview

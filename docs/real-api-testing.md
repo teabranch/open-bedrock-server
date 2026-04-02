@@ -1,3 +1,9 @@
+---
+title: Real API Testing
+nav_order: 8
+description: Real API integration tests with live credentials
+---
+
 # Real API Integration Tests
 
 This directory contains comprehensive integration tests that use real API credentials from your `.env` file to test the actual functionality of OpenAI and AWS Bedrock services.

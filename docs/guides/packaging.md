@@ -1,3 +1,10 @@
+---
+title: Packaging
+parent: Guides
+nav_order: 6
+description: Guide for packaging and publishing to PyPI
+---
+
 # Packaging Guide for PyPI
 
 This guide outlines the steps to package the `open-bedrock-server` project and publish it to the Python Package Index (PyPI).

@@ -1,3 +1,9 @@
+---
+title: Testing
+nav_order: 7
+description: Test suite organization and CI/CD testing strategies
+---
+
 # Test Suite Organization
 
 This directory contains a comprehensive test suite organized for different CI/CD scenarios. The tests are carefully separated to ensure **safe CI execution** while still providing **real API validation**.
