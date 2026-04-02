@@ -25,7 +25,7 @@ Branch naming conventions:
 | Type | Pattern | Example |
 | --- | --- | --- |
 | Bug fix | `fix/<short-desc>` | `fix/streaming-error-handling` |
-| Feature | `feat/<short-desc>` | `feat/persistent-history` |
+| Feature | `feature/<short-desc>` | `feature/persistent-history` |
 | Docs | `docs/<short-desc>` | `docs/event-system-refresh` |
 
 ## Step 1b — Check for existing PRs on the branch
@@ -103,14 +103,14 @@ sleep 300
 After the initial wait, poll every 2 minutes until comments appear:
 
 ```bash
-bash ~/.claude/skills/pr-review/scripts/pr-comments.sh <PR_NUMBER>
+bash .claude/skills/pr-review/scripts/pr-comments.sh <PR_NUMBER>
 ```
 
 If no comments yet, wait and retry:
 
 ```bash
 sleep 120
-bash ~/.claude/skills/pr-review/scripts/pr-comments.sh <PR_NUMBER>
+bash .claude/skills/pr-review/scripts/pr-comments.sh <PR_NUMBER>
 ```
 
 Continue until at least one unresolved comment exists, or 3 consecutive polls
@@ -155,16 +155,17 @@ Guidelines:
 Use batch mode to reply to all comments at once:
 
 ```bash
-bash ~/.claude/skills/pr-review/scripts/pr-batch.sh --resolve <PR_NUMBER> <<'EOF'
+bash .claude/skills/pr-review/scripts/pr-batch.sh --resolve <PR_NUMBER> <<'EOF'
 {"comment_id": 123, "body": "Fixed -- changed X to Y.\n\n- Claude"}
-{"comment_id": 456, "body": "Intentional -- this follows the pattern in Z because...\n\n- Claude"}
+{"comment_id": 456, "body": "Intentional -- follows pattern in Z.\n\n- Claude"}
 EOF
 ```
 
 Or reply to a single comment:
 
 ```bash
-bash ~/.claude/skills/pr-review/scripts/pr-reply.sh --resolve <PR_NUMBER> <COMMENT_ID> "Fixed -- updated.\n\n- Claude"
+bash .claude/skills/pr-review/scripts/pr-reply.sh \
+  --resolve <PR_NUMBER> <COMMENT_ID> "Fixed -- updated.\n\n- Claude"
 ```
 
 **Important:**
@@ -201,9 +202,10 @@ git add <files> && git commit -m "message"
 git push -u origin docs/my-change
 gh pr create --title "..." --body "..."
 sleep 300
-bash ~/.claude/skills/pr-review/scripts/pr-comments.sh <PR>
+bash .claude/skills/pr-review/scripts/pr-comments.sh <PR>
 # ... enter plan mode, triage, get approval ...
 # ... fix issues, commit, push ...
-bash ~/.claude/skills/pr-review/scripts/pr-batch.sh --resolve <PR> <<< '{"comment_id":N,"body":"Fixed\n\n- Claude"}'
+bash .claude/skills/pr-review/scripts/pr-batch.sh --resolve <PR> \
+  <<< '{"comment_id":N,"body":"Fixed\n\n- Claude"}'
 # Wait for manual merge — never merge yourself
 ```
