@@ -1,5 +1,5 @@
 ---
-title: Testing
+title: Test Suite
 nav_order: 7
 description: Test suite organization and CI/CD testing strategies
 ---

@@ -16,10 +16,6 @@ aux_links:
     - "https://github.com/teabranch/open-bedrock-server"
 aux_links_new_tab: true
 
-footer_content: >-
-  Open Bedrock Server — Licensed under
-  <a href="https://github.com/teabranch/open-bedrock-server/blob/main/LICENSE">MIT</a>.
-
 webmaster_verifications:
   google: SAWMasZ1hKCZm8hnk0xFUgqnFYYPgdrKG8jKuTJa6a0
 
