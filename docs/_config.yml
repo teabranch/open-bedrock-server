@@ -1,8 +1,8 @@
 title: Open Bedrock Server
 description: >-
   A unified, provider-agnostic chat completions API server supporting OpenAI and AWS Bedrock.
-baseurl: "/open-bedrock-server"
-url: "https://teabranch.github.io"
+baseurl: ""
+url: "https://open-bedrock-server.teabranch.dev"
 
 theme: just-the-docs
 color_scheme: anthropic
@@ -19,9 +19,14 @@ aux_links_new_tab: true
 webmaster_verifications:
   google: SAWMasZ1hKCZm8hnk0xFUgqnFYYPgdrKG8jKuTJa6a0
 
+footer_content: >-
+  Open Bedrock Server — Licensed under
+  <a href="https://github.com/teabranch/open-bedrock-server/blob/main/LICENSE">MIT</a>.
+
 plugins:
   - jekyll-seo-tag
   - jekyll-relative-links
+  - jekyll-sitemap
 
 relative_links:
   enabled: true
