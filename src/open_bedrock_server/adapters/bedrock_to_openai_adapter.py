@@ -31,10 +31,20 @@ class BedrockToOpenAIAdapter(BaseLLMAdapter):
     def __init__(self, openai_model_id: str, **kwargs):
         super().__init__(openai_model_id, **kwargs)
         self.openai_model_id = openai_model_id
-        self.openai_adapter = OpenAIAdapter(model_id=openai_model_id, **kwargs)
+        self._openai_adapter = None
+        self._openai_adapter_kwargs = kwargs
         logger.info(
             f"BedrockToOpenAIAdapter initialized for OpenAI model: {self.openai_model_id}"
         )
+
+    @property
+    def openai_adapter(self) -> OpenAIAdapter:
+        """Lazily initialize OpenAIAdapter only when needed for API calls."""
+        if self._openai_adapter is None:
+            self._openai_adapter = OpenAIAdapter(
+                model_id=self.openai_model_id, **self._openai_adapter_kwargs
+            )
+        return self._openai_adapter
 
     def convert_bedrock_to_openai_request(
         self, bedrock_request: BedrockClaudeRequest | BedrockTitanRequest

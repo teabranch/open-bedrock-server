@@ -567,7 +567,9 @@ class BedrockService(AbstractLLMService):
                     delta_content = chunk_data.get("delta", {}).get("text", "")
                 elif chunk_data["type"] == "message_delta":
                     delta_payload = chunk_data.get("delta", {})
-                    finish_reason = delta_payload.get("stop_reason")
+                    finish_reason = self._map_finish_reason(
+                        delta_payload.get("stop_reason")
+                    )
                 elif chunk_data["type"] == "message_stop":
                     # This might not have content but confirms end of message with metrics
                     # If finish_reason wasn't in message_delta, it might be inferred here or from invocation metrics
@@ -639,7 +641,9 @@ class BedrockService(AbstractLLMService):
                     CoreChatCompletionChoice(
                         index=0,
                         message=Message(role="assistant", content=assistant_content),
-                        finish_reason=response_body.get("stop_reason"),
+                        finish_reason=self._map_finish_reason(
+                            response_body.get("stop_reason")
+                        ),
                     )
                 ],
             )
@@ -788,6 +792,24 @@ class BedrockService(AbstractLLMService):
                 f"Error during Bedrock Titan stream processing for {model_id}: {str(e)}"
             )
 
+    @staticmethod
+    def _map_finish_reason(provider_reason: str | None) -> str | None:
+        """Maps provider-specific finish/stop reasons to OpenAI-compatible reasons."""
+        if provider_reason is None:
+            return None
+        mapping = {
+            # Claude / Anthropic
+            "end_turn": "stop",
+            "max_tokens": "length",
+            "stop_sequence": "stop",
+            "tool_use": "tool_calls",
+            # Titan
+            "FINISH": "stop",
+            "LENGTH": "length",
+            "CONTENT_FILTERED": "content_filter",
+        }
+        return mapping.get(provider_reason, provider_reason)
+
     async def chat_completion(
         self,
         messages: list[Message],
@@ -870,36 +892,63 @@ class BedrockService(AbstractLLMService):
 
     async def list_models(self) -> list[ModelProviderInfo]:
         logger.info(
-            f"BedrockService: Fetching foundation models from Bedrock region: {self.AWS_REGION}"
+            f"BedrockService: Fetching on-demand models from Bedrock region: {self.AWS_REGION}"
         )
         all_bedrock_models = []
+        seen_ids: set[str] = set()
         try:
-            paginator = self.bedrock_client.get_paginator("list_foundation_models")
-            for page in await asyncio.to_thread(
-                lambda: list(paginator.paginate(byInferenceType="ON_DEMAND"))
-            ):
-                for model_summary in page.get("modelSummaries", []):
-                    if "TEXT" in model_summary.get("outputModalities", []):
+            # Fetch foundation models
+            fm_response = await asyncio.to_thread(
+                lambda: self.bedrock_client.list_foundation_models(byInferenceType="ON_DEMAND")
+            )
+            for model_summary in fm_response.get("modelSummaries", []):
+                if "TEXT" in model_summary.get("outputModalities", []):
+                    model_id = model_summary["modelId"]
+                    if model_id not in seen_ids:
+                        seen_ids.add(model_id)
                         all_bedrock_models.append(
                             ModelProviderInfo(
-                                id=model_summary["modelId"],
+                                id=model_id,
                                 provider="bedrock",
                                 display_name=model_summary.get(
-                                    "modelName", model_summary["modelId"]
+                                    "modelName", model_id
                                 ),
                             )
                         )
+
+            # Fetch inference profiles (cross-region and application profiles)
+            try:
+                paginator = self.bedrock_client.get_paginator("list_inference_profiles")
+                pages = await asyncio.to_thread(
+                    lambda: list(paginator.paginate())
+                )
+                for page in pages:
+                    for profile in page.get("inferenceProfileSummaries", []):
+                        profile_id = profile.get("inferenceProfileId", "")
+                        if profile_id and profile_id not in seen_ids:
+                            seen_ids.add(profile_id)
+                            all_bedrock_models.append(
+                                ModelProviderInfo(
+                                    id=profile_id,
+                                    provider="bedrock",
+                                    display_name=profile.get(
+                                        "inferenceProfileName", profile_id
+                                    ),
+                                )
+                            )
+            except Exception as e:
+                logger.warning(f"Could not list inference profiles: {e}")
+
             logger.info(f"Found {len(all_bedrock_models)} potential Bedrock models.")
             return all_bedrock_models
         except ClientError as e:
-            # Handle specific errors like AccessDeniedException if needed for list_models
             logger.error(
                 f"Bedrock API error listing models: {e}. Ensure Bedrock model access is enabled in region {self.AWS_REGION}."
             )
             self._handle_bedrock_client_error(
-                e, "list_foundation_models"
-            )  # Reuses handler, model_id is just for logging context
-            return []  # Or re-raise as appropriate
+                e, "list_models"
+            )
+            return []
         except Exception as e:
             logger.error(f"Unexpected error listing Bedrock models: {e}")
             raise ServiceApiError(f"Unexpected error listing Bedrock models: {str(e)}")

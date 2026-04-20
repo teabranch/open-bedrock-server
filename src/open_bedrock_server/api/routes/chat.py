@@ -371,6 +371,8 @@ async def unified_chat_completions(
                         else:  # Yield OpenAI chunk
                             yield f"data: {json.dumps(chunk.model_dump(exclude_none=True))}\n\n"
 
+                    yield "data: [DONE]\n\n"
+
                 except HTTPException:
                     raise
                 except Exception as e_stream:

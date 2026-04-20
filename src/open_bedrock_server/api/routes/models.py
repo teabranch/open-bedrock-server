@@ -44,21 +44,23 @@ async def list_models_route():  # Renamed to avoid conflict with imported list_m
     except Exception as e:
         logger.error(f"Error listing models from OpenAI: {e}")
 
-    # Placeholder for Bedrock models (when BedrockService is implemented)
-    # try:
-    #     bedrock_service = LLMServiceFactory.get_service("bedrock")
-    #     if hasattr(bedrock_service, 'list_models') and callable(bedrock_service.list_models):
-    #         bedrock_models = await bedrock_service.list_models()
-    #         all_models.extend(bedrock_models)
-    #         logger.info(f"Successfully fetched {len(bedrock_models)} models from Bedrock.")
-    #     else:
-    #         logger.warning("Bedrock service from factory does not have a callable list_models method.")
-    # except NotImplementedError:
-    #     logger.info("Bedrock service not yet implemented, skipping model listing for Bedrock.")
-    # except ValueError as e:
-    #     logger.warning(f"Could not get Bedrock service from factory: {e}")
-    # except Exception as e:
-    #     logger.error(f"Error listing models from Bedrock: {e}")
+    # Bedrock models (when BedrockService is implemented)
+    try:
+        bedrock_service = LLMServiceFactory.get_service("bedrock")
+        if hasattr(bedrock_service, "list_models") and callable(
+            bedrock_service.list_models
+        ):
+            bedrock_models = await bedrock_service.list_models()
+            all_provider_models.extend(bedrock_models)
+            logger.info(f"Fetched {len(bedrock_models)} models from Bedrock.")
+        else:
+            logger.warning("Bedrock service does not have a callable list_models method.")
+    except NotImplementedError:
+        logger.info("Bedrock service list_models not yet implemented, skipping.")
+    except ValueError as e:
+        logger.warning(f"Could not get Bedrock service from factory: {e}")
+    except Exception as e:
+        logger.error(f"Error listing models from Bedrock: {e}")
 
     # Map List[ModelProviderInfo] to List[ModelInfo] for the response
     api_model_list: list[ModelInfo] = []
